@@ -31,7 +31,7 @@ window.onload = function () {
             count = allMusicNum;
         }
         audioVice.src = "http://127.0.0.1:8000/static/music/5.mp3";
-        console.log(audioVice.src);
+        // console.log(audioVice.src);
         audioVice.play();
         pauseBut.style.display = "block";
         playBut.style.display = "none";
@@ -46,7 +46,7 @@ window.onload = function () {
             count = 1;
         }
         audioVice.src = "https://m7.music.126.net/20200207000621/d5875e00ce58c36308136dc195bb7723/ymusic/8972/6e6e/7b86/bddf788bf92e62d7c5c9aa457dd27bf5.mp3";
-        console.log(audioVice.src);
+        // console.log(audioVice.src);
         audioVice.play();
         pauseBut.style.display = "block";
         playBut.style.display = "none";
@@ -110,7 +110,7 @@ window.onload = function () {
             //音量值的设定
             volumeNum = moveX / 200;
             audioVice.volume = audioVice.volume + volumeNum;
-            console.log(audioVice.volume);
+            // console.log(audioVice.volume);
 
         }
 
@@ -172,20 +172,22 @@ window.onload = function () {
         var tInt = tt.split(".")[0];
         var tFloat = parseInt(parseFloat("0." + tt.split(".")[1]) * 60);
         var timeStr = tInt + ":" + tFloat;
-        console.log(timeStr);
+        // console.log(timeStr);
         return timeStr;
 
     }
 
+
     function getSongByListTag() {
         $.post("/spidertask/getSongListById", {playlistTag: '华语'}, function (result) {
             var songList = result.playlist.tracks;
-            console.log(songList);
+            var playlistTag = result.mytag;
+            // console.log(songList);
             var $ul = $("#songList");
-            var tag = $("<li id='tag' data='华语' style='margin-bottom: 10px;'>类别：华语</li>");
+            var tag = $("<li id='tag' data='" + playlistTag + "' style='margin-bottom: 10px;'>类别：" + playlistTag + "</li>");
             $ul.append(tag);
             for (var i = 0; i < songList.length; i++) {
-                var $li = $("<li songId='" + songList[i].id + "'>" + songList[i].name + "</li>");
+                var $li = $("<li songId='" + songList[i].id + "' onclick='getSong(this)'>" + songList[i].name.substring(0, 30) + "</li>");
                 $ul.append($li);
             }
         });
@@ -197,19 +199,73 @@ window.onload = function () {
     var change = document.getElementById("change");
     change.addEventListener("click", function () {
         var tag = $('#tag').attr('data');
-        alert(tag);
         $.post("/spidertask/getSongListById", {playlistTag: tag}, function (result) {
             var songList = result.playlist.tracks;
-            console.log(songList);
+            var playlistTag = result.mytag;
+            // console.log(songList);
             var $ul = $("#songList");
-            var tag = $("<li id='tag' data='华语' style='margin-bottom: 10px;'>类别：华语</li>");
+            $ul.empty();
+            var tag = $("<li id='tag' data='" + playlistTag + "' style='margin-bottom: 10px;'>类别：" + playlistTag + "</li>");
             $ul.append(tag);
             for (var i = 0; i < songList.length; i++) {
-                var $li = $("<li songId='" + songList[i].id + "'>" + songList[i].name + "</li>");
+                var $li = $("<li songId='" + songList[i].id + "'>" + songList[i].name.substring(0, 30) + "</li>");
                 $ul.append($li);
             }
         });
     }, false);
+
+
+    function getSong(obj) {
+        var songId = obj.songId; //曲Id
+        var songName = obj.text; //曲名
+        var tag = $('#tag').attr('data'); // 歌曲分类
+        var userId = $('#user span').attr('userId'); // 用户Id
+
+        //请求网易云音乐接口
+        $.get(
+            "https://api.imjad.cn/cloudmusic/?type=song&id=28012031&br=128000", {}, function (data, state) {
+                //这里显示从服务器返回的数据
+                alert(data);
+            }
+        );
+
+        // 请求自己后台，记录用户听过歌曲
+        $.get(
+            "/spidertask/", {
+                songId: songId,
+                songName: songName,
+                songTag: tag,
+                userId: userId,
+            }, function (data, state) {
+                //这里显示从服务器返回的数据
+                console.log('记录成功');
+            }
+        );
+    }
+
+
+    // 为搜索按钮添加点击事件
+    var serachBtn = document.getElementById("search_button");
+    serachBtn.addEventListener('click', function () {
+        var searchContent = $('#appendedInputButton')[0].value;
+        $.get(
+            "https://api.imjad.cn/cloudmusic/", {
+                type: 'search',
+                search_type: 1,
+                s: searchContent,
+            }, function (data, state) {
+                //这里显示从服务器返回的数据
+                console.log(data);
+                var songs = data.result.songs;
+                var $ul = $("#sameList");
+                $ul.empty();
+                for (var i = 0; i < 8; i++) {
+                    var $li = $("<li songId='" + songs[i].id + "' onclick='getSong(this)'>" + songs[i].name.substring(0,13) + "</li>");
+                    $ul.append($li);
+                }
+            }
+        );
+    });
 
 
 }

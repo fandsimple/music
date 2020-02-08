@@ -38,11 +38,28 @@
 
     <div class="input-append" id="search">
         <input class="span2" id="appendedInputButton" type="text">
-        <button class="btn" type="button">Go!</button>
+        <button class="btn" type="button" id="search_button">Go!</button>
     </div>
 
+    <!--左边内容-->
     <ul id="songList"></ul>
     <button class="btn-warning" id="change">换一批</button>
+
+    <!--用户-->
+    <div style="position: absolute; left: 30px;top: 30px" id="user">
+        <img src="{% static 'img/user.png' %}" class="img-circle" width="40" height="40">
+        <span style="font-size: 25px;color: #e1e1e1;" userId="123">fandsimple</span>
+    </div>
+    <!--左边内容-->
+    <ul id="sameList"></ul>
+
+    <div class="alert alert-success" id="rec">
+        大眠（女生版）- 热歌推介
+    </div>
+    <div class="alert alert-success" id="rec1">
+        有你就好。- 你可能喜欢
+    </div>
+
 
 </div>
 </body>

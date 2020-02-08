@@ -7,17 +7,21 @@ import os
 
 
 def face(path):
+    # 将资料加载进入系统
     # 存储知道人名列表
     known_names = []
     # 存储知道的特征值
     known_encodings = []
     for image_name in os.listdir(path):
-        load_image = face_recognition.load_image_file(path + '/' + image_name)  # 加载图片
+        load_image = face_recognition.load_image_file(os.path.join(path, image_name))  # 加载图片
         image_face_encoding = face_recognition.face_encodings(load_image)[0]  # 获得128维特征值
         known_names.append(image_name.split(".")[0])
         known_encodings.append(image_face_encoding)
     print(known_encodings)
 
+
+
+    # 开始识别
     # 打开摄像头，0表示内置摄像头
     video_capture = cv2.VideoCapture(0)
 

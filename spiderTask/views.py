@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import random
+
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 import pdb
@@ -9,7 +12,7 @@ import json
 
 from django.urls import reverse
 
-from spiderTask.models import User, Playlist
+from spiderTask.models import User, Playlist, RecderAlter, RecRetAlter
 
 
 def index(request):
@@ -56,9 +59,11 @@ def login(request):
 
 
 def getSongListById(request):  # 通过歌单Id获取歌单
-    playlistTag = request.GET.get('playlistTag', '华语')
-    playlist = Playlist.objects.get(playlistTag=playlistTag)
+    playlistTag = request.POST.get('playlistTag', '华语')
+    playlist = Playlist.objects.filter(~Q(playlistTag=playlistTag))
+    playlist = random.choice(playlist)
     playlistId = playlist.playlistId
+    tag = playlist.playlistTag
     headers = {
         'authority': 'api.imjad.cn',
         'pragma': 'no-cache',
@@ -78,4 +83,31 @@ def getSongListById(request):  # 通过歌单Id获取歌单
     )
     response = requests.get('https://api.imjad.cn/cloudmusic/', headers=headers, params=params)
     songData = json.loads(response.text)
+    songData['mytag'] = tag
     return JsonResponse(songData)
+
+
+
+
+def myrec(request):
+    recder = RecderAlter()
+    recder.songId = request.GET.get('songId')
+    recder.songName = request.GET.get('songName')
+    recder.songTag = request.GET.get('songTag')
+    recder.userId = request.GET.get('userId')
+    recder.save()
+    data = {
+        'code':200,
+        'msg':'success'
+    }
+    return JsonResponse(data)
+
+
+def getRec(request):
+    pass
+
+
+
+
+
+

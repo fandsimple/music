@@ -126,4 +126,27 @@ class Playlist(BaseMode):
     createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
 
 
+class RecderAlter(BaseMode):
+    # userId	songId	songTag
+    class Meta:
+        verbose_name_plural = '收听记录表'
+        db_table = 'recderalter'
 
+    userId = models.CharField(max_length=255, default='', verbose_name='用户Id')
+    songId = models.CharField(max_length=255, null=False, verbose_name='已收听歌曲Id')
+    songTag = models.CharField(max_length=255, null=False, verbose_name='歌曲分类')
+    songName = models.CharField(max_length=255, null=False, verbose_name='曲名', default='')
+    createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+
+
+class RecRetAlter(BaseMode):
+    class Meta:
+        verbose_name_plural = '推介结果表'
+        db_table = 'recretalter'
+
+    userId = models.CharField(max_length=255, default='', verbose_name='用户Id')
+    songId = models.CharField(max_length=255, null=False, verbose_name='歌曲Id')
+    songName = models.CharField(max_length=255, default='', verbose_name='曲名')
+    source = models.CharField(max_length=255, default='热歌推介', verbose_name='推介来源')
+    isReced = models.CharField(max_length=1, default='否', verbose_name='是否被推介过')
