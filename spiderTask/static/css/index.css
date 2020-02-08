@@ -1,0 +1,176 @@
+#box {
+    width: 1200px;
+    height: 800px;
+    background-image: url(../img/5783406a7bced_1024.jpg);
+    background-size: 1200px 800px;
+    margin: 0 auto;
+    position: relative;
+    /*background-position: 0 -50px;
+    background-repeat: no-repeat;*/
+
+}
+
+.button {
+    width: 50px;
+    height: 50px;
+    background-size: 50px 50px;
+    position: absolute;
+    top: 730px;
+}
+
+#play {
+
+    background-image: url(../img/1.png);
+    right: 750px;
+}
+
+#pause {
+    background-image: url(../img/4.png);
+    right: 750px;
+    display: none;
+}
+
+#before {
+
+    background-image: url(../img/3.png);
+    right: 850px;
+}
+
+#after {
+
+    background-image: url(../img/2.png);
+    right: 650px;
+}
+
+#volume {
+    background-image: url(../img/音量.png);
+    right: 500px;
+}
+
+#mute {
+    background-image: url(../img/静音.png);
+    right: 500px;
+    display: none;
+}
+
+/*音量滚动条*/
+.c {
+    width: 10px;
+    height: 10px;
+    border: 1px solid black;
+    border-radius: 50%;
+    background-color: yellow;
+}
+
+#vLength {
+    width: 200px;
+    height: 5px;
+    background-color: red;
+    position: absolute;
+    /*right: 290px;*/
+    top: 753px;
+    left: 710px;
+}
+
+#vLengh1 {
+    width: 80px;
+    height: 5px;
+    background-color: yellow;
+    position: absolute;
+    top: 753px;
+    /*right: 490px;*/
+    left: 710px;
+}
+
+#vC {
+    position: absolute;
+    /*right: 490px;*/
+    left: 790px;
+    /*left: 710px;*/
+    top: 750px;
+}
+
+/*播放进度的滚动条*/
+#dLength {
+    width: 600px;
+    height: 5px;
+    background-color: gray;
+    position: absolute;
+    /*right: 290px;*/
+    left: 310px;
+    top: 700px;
+}
+
+#dC {
+    position: absolute;
+    top: 697px;
+    /*right: 880px;*/
+    left: 310px;
+}
+
+#dLength1 {
+    width: 0px;
+    height: 5px;
+    background-color: yellow;
+    position: absolute;
+    top: 700px;
+    /*right: 880px;*/
+    left: 310px;
+}
+
+.time {
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    top: 660px;
+    /*background-color:yellow ;*/
+}
+
+#currentTime {
+    left: 310px;
+}
+
+#endTime {
+    left: 820px;
+}
+
+/*播放模式*/
+#loop {
+    left: 580px;
+    background-image: url(../img/单曲循环.png);
+}
+
+#order {
+    left: 580px;
+    background-image: url(../img/顺序播放.png);
+    display: none;
+
+}
+
+/*歌曲搜索*/
+#search {
+    position: absolute;
+    left: 700px;
+    top: 80px;
+}
+
+
+#songList {
+    position: absolute;
+    top: 230px;
+    color: #000;
+
+}
+
+#songList li{
+    margin-top: 10px;
+
+}
+
+#change{
+    position: absolute;
+    top: 600px;
+    left: 20px;
+}
+
+ 

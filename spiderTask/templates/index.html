@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <title>音乐播放器</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" type="text/css" media="all">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" media="all">
+    <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+
+</head>
+
+<body>
+<div id="box">
+    <audio id="vice" src="{% static 'music/1.mp3' %}" controls="controls" style="display: none;"></audio>
+    <div id="play" class="button"></div>
+    <div id="pause" class="button"></div>
+    <div id="before" class="button"></div>
+    <div id="after" class="button"></div>
+    <!--音量-->
+    <div id="volume" class="button"></div>
+    <div id="mute" class="button"></div>
+    <div id="vLength"></div>
+    <div id="vLengh1"></div>
+    <div id="vC" class="c"></div>
+    <!--播放进度-->
+    <div id="dLength"></div>
+    <div id="dLength1"></div>
+    <div id="dC" class="c"></div>
+    <!--播放时间-->
+    <div id="currentTime" class="time">00:00</div>
+    <div id="endTime" class="time"></div>
+    <!--单曲循环，顺序播放-->
+    <div id="loop" class="button"></div>
+    <div id="order" class="button"></div>
+
+    <div class="input-append" id="search">
+        <input class="span2" id="appendedInputButton" type="text">
+        <button class="btn" type="button">Go!</button>
+    </div>
+
+    <ul id="songList"></ul>
+    <button class="btn-warning" id="change">换一批</button>
+
+</div>
+</body>
+
+</html>
