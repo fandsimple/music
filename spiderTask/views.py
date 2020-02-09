@@ -16,7 +16,10 @@ from spiderTask.models import User, Playlist, RecderAlter, RecRetAlter
 
 
 def index(request):
-    return render(request, 'index.html')
+    userName = request.session.get('username')
+    if userName:
+        return render(request, 'index.html', {'userName': userName})
+    return render(request, 'index.html', {'userName':'null'})
 
 
 def register(request):
@@ -48,12 +51,13 @@ def login(request):
             hl.update(password.encode(encoding='utf-8'))
             if dbPassword == hl.hexdigest():
                 # 登录成功
-                return redirect(reverse('index', kwargs={'username': userName}))
+                request.session['username'] = userName
+                return redirect('/spidertask/index/')
             else:
                 # 登录失败
-                pass
+                return render(request, 'login.html', {'userName':'error'})
         # 登录失败
-        pass
+        return render(request, 'login.html', {'userName':'error'})
     elif request.method == 'GET':
         return render(request, 'login.html')
 
@@ -87,27 +91,98 @@ def getSongListById(request):  # 通过歌单Id获取歌单
     return JsonResponse(songData)
 
 
-
-
 def myrec(request):
+    songTag = request.GET.get('songTag')
+    if not songTag:
+        songTag = '喜欢'
+    userName = request.GET.get('userName')
+    data = {
+        'code': 200,
+        'msg': '游客不记录'
+    }
+    print(userName)
+    if not userName:
+        return JsonResponse(data)
+    user = User.objects.filter(userName=userName)
+    if not user:
+        return JsonResponse(data)
+    userId = user[0].userId
     recder = RecderAlter()
     recder.songId = request.GET.get('songId')
     recder.songName = request.GET.get('songName')
-    recder.songTag = request.GET.get('songTag')
-    recder.userId = request.GET.get('userId')
+    recder.songTag = songTag
+    recder.userId = userId
     recder.save()
     data = {
-        'code':200,
-        'msg':'success'
+        'code': 200,
+        'msg': 'success'
     }
     return JsonResponse(data)
 
 
 def getRec(request):
-    pass
+    userId = request.GET.get('userId', '11')
+    # 请求热歌
+    hotData = []
+    data = getHot()
+    for hot in data:
+        hotData.append([
+            hot.get('id'),
+            hot.get('name'),
+            '热歌推介'
+        ])
+
+    # 请求recretalter中对应用户的歌曲
+    userData = []
+    if userId:
+        recretalter = RecRetAlter.objects.filter(userId=userId)
+        if recretalter:
+            for per in recretalter:
+                persong = [
+                    per.songId,
+                    per.songName,
+                    '您可能喜欢'
+                ]
+                userData.append(persong)
+
+    # # 根据同龄人进行推介 todo
+    # if userId:
+    #     user = User.objects.filter(userId=userId)
+    #     if user:
+    #         age = user.age
+
+    resData = hotData + userData
+    random.shuffle(resData)
+    data = {
+        'msg':200,
+        'data':random.choice(resData),
+    }
+    return JsonResponse(data)
 
 
-
-
-
-
+def getHot():
+    playlist = Playlist.objects.filter(playlistTag='华语')
+    playlist = random.choice(playlist)
+    playlistId = playlist.playlistId
+    tag = playlist.playlistTag
+    headers = {
+        'authority': 'api.imjad.cn',
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache',
+        'upgrade-insecure-requests': '1',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36',
+        'sec-fetch-user': '?1',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'sec-fetch-site': 'none',
+        'sec-fetch-mode': 'navigate',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'zh-CN,zh;q=0.9',
+    }
+    params = (
+        ('type', 'playlist'),
+        ('id', playlistId),
+    )
+    response = requests.get('https://api.imjad.cn/cloudmusic/', headers=headers, params=params)
+    songData = json.loads(response.text)
+    songData = songData.get('playlist', {}).get('tracks', [])
+    return songData

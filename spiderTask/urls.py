@@ -9,5 +9,8 @@ urlpatterns = [
     url(r'register', views.register, name='register'),
     url(r'getSongListById', views.getSongListById, name='getSongListById'),
 
+    url(r'getRec', views.getRec, name='getRec'),
+    url(r'myrec', views.myrec, name='myrec'),
+
 
 ]
