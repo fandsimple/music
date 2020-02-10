@@ -19,7 +19,7 @@ def index(request):
     userName = request.session.get('username')
     if userName:
         return render(request, 'index.html', {'userName': userName})
-    return render(request, 'index.html', {'userName':'null'})
+    return render(request, 'index.html', {'userName': 'null'})
 
 
 def register(request):
@@ -55,9 +55,9 @@ def login(request):
                 return redirect('/spidertask/index/')
             else:
                 # 登录失败
-                return render(request, 'login.html', {'userName':'error'})
+                return render(request, 'login.html', {'userName': 'error'})
         # 登录失败
-        return render(request, 'login.html', {'userName':'error'})
+        return render(request, 'login.html', {'userName': 'error'})
     elif request.method == 'GET':
         return render(request, 'login.html')
 
@@ -121,7 +121,11 @@ def myrec(request):
 
 
 def getRec(request):
-    userId = request.GET.get('userId', '11')
+    userName = request.GET.get('userName', '')
+    user = User.objects.filter(userName=userName)
+    userId = ''
+    if user:
+        userId = user[0].userId
     # 请求热歌
     hotData = []
     data = getHot()
@@ -133,6 +137,7 @@ def getRec(request):
         ])
 
     # 请求recretalter中对应用户的歌曲
+
     userData = []
     if userId:
         recretalter = RecRetAlter.objects.filter(userId=userId)
@@ -151,11 +156,22 @@ def getRec(request):
     #     if user:
     #         age = user.age
 
-    resData = hotData + userData
+    # 同龄人听
+    sameData = []
+    sameDataTem = getSameAgeSong()
+    for sd in sameDataTem:
+        sameData.append([
+            sd.get('id'),
+            sd.get('name'),
+            '同龄人在听'
+        ])
+
+    resData = hotData + userData + sameData
     random.shuffle(resData)
     data = {
-        'msg':200,
-        'data':random.choice(resData),
+        'msg': 200,
+        'data': random.choice(resData),
+        # 'data':resData,
     }
     return JsonResponse(data)
 
@@ -165,6 +181,31 @@ def getHot():
     playlist = random.choice(playlist)
     playlistId = playlist.playlistId
     tag = playlist.playlistTag
+    headers = {
+        'authority': 'api.imjad.cn',
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache',
+        'upgrade-insecure-requests': '1',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36',
+        'sec-fetch-user': '?1',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'sec-fetch-site': 'none',
+        'sec-fetch-mode': 'navigate',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'zh-CN,zh;q=0.9',
+    }
+    params = (
+        ('type', 'playlist'),
+        ('id', playlistId),
+    )
+    response = requests.get('https://api.imjad.cn/cloudmusic/', headers=headers, params=params)
+    songData = json.loads(response.text)
+    songData = songData.get('playlist', {}).get('tracks', [])
+    return songData
+
+
+def getSameAgeSong():
+    playlistId = '2356878562'
     headers = {
         'authority': 'api.imjad.cn',
         'pragma': 'no-cache',

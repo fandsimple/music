@@ -21,25 +21,145 @@ window.onload = function () {
         playBut.style.display = "block";
     }, false);
 
+
+    // 上一首下一首调用播放函数
+    function playSong(songId, songName, tag) {
+        // var songId = obj.target.getAttribute('songId'); //曲Id
+        // var songName = obj.target.textContent; //曲名
+        // var tag = obj.target.getAttribute('tag'); // 歌曲分类
+
+        console.log(songId, songName, tag);
+
+        var $userSpan = $('div#user span');
+        var userName = ''; // 用户名
+        if ($userSpan.length != 0) {
+            userName = $userSpan.text();
+        }
+
+        //请求网易云音乐接口
+        $.get(
+            "https://api.imjad.cn/cloudmusic/", {
+                'type': 'song',
+                'id': songId,
+                'br': '128000'
+            }, function (data, state) {
+                //这里显示从服务器返回的数据
+                console.log(data);
+                console.log(data.data[0].url);
+                var songUrl = data.data[0].url;
+                audioVice.src = songUrl;
+                audioVice.play();
+                pauseBut.style.display = "block";
+                playBut.style.display = "none";
+
+                $('#songname').text('正在播放：' + songName);
+
+            }
+        );
+
+        // 请求自己后台，记录用户听过歌曲
+        $.get(
+            "/spidertask/myrec", {
+                songId: songId,
+                songName: songName,
+                songTag: tag,
+                userName: userName,
+            }, function (data, state) {
+                //这里显示从服务器返回的数据
+                console.log(data);
+            }
+        );
+    }
+
+
     //上一曲下一曲
     var beforeBut = document.getElementById("before");
     var afterBut = document.getElementById("after");
     beforeBut.addEventListener("click", function () {
-        audioVice.src = "http://127.0.0.1:8000/static/music/5.mp3";
-        // console.log(audioVice.src);
-        audioVice.play();
-        pauseBut.style.display = "block";
-        playBut.style.display = "none";
+        var $currentRed = $('#red');
+        if ($currentRed.length != 0) {
+            // 找到上一个标红播放
+            var $prevSong = $currentRed.prev();
+            if ($prevSong.length != 0) {
+                //有上一首情况
+                var songId = $prevSong.attr('songId');
+                var tag = $prevSong.attr('tag');
+                var songName = $prevSong.text();
+                $prevSong.css("color", "red");
+                $prevSong.attr('id', 'red');
+                playSong(songId, songName, tag);
+            } else {
+                // 没有上一首情况，从尾部开始播放
+                var leftSongList = document.getElementById('songList');
+                var $lastnode = $(leftSongList.lastChild);
+                var songId = $lastnode.attr('songId');
+                var tag = $lastnode.attr('tag');
+                var songName = $lastnode.text();
+                $lastnode.css("color", "red");
+                $lastnode.attr('id', 'red');
+                playSong(songId, songName, tag);
+            }
+            // 将上一首恢复原来状态
+            $currentRed.attr('id', '');
+            $currentRed.css('color', '#74bd59');
+
+        } else {
+            //从头开始播放
+            var leftSongList = document.getElementById('songList');
+            var $firstnode = $(leftSongList.firstChild);
+            var songId = $firstnode.attr('songId');
+            var tag = $firstnode.attr('tag');
+            var songName = $firstnode.text();
+            $firstnode.css("color", "red");
+            $firstnode.attr('id', 'red');
+            playSong(songId, songName, tag);
+        }
+
     }, false);
 
     afterBut.addEventListener("click", next, false);
 
     function next() {
-        audioVice.src = "http://127.0.0.1:8000/static/music/5.mp3";
-        // console.log(audioVice.src);
-        audioVice.play();
-        pauseBut.style.display = "block";
-        playBut.style.display = "none";
+        var $currentRed = $('#red');
+        if ($currentRed.length != 0) {
+            // 找到上一个标红播放
+            var $nextSong = $currentRed.next();
+            if ($nextSong.length != 0) {
+                //有下一首情况
+                var songId = $nextSong.attr('songId');
+                var tag = $nextSong.attr('tag');
+                var songName = $nextSong.text();
+                $nextSong.css("color", "red");
+                $nextSong.attr('id', 'red');
+                playSong(songId, songName, tag);
+            } else {
+                // 没有下一首情况，从头部开始播放
+                var leftSongList = document.getElementById('songList');
+                var $firstChild = $(leftSongList.firstChild);
+                var songId = $firstChild.attr('songId');
+                var tag = $firstChild.attr('tag');
+                var songName = $firstChild.text();
+                $firstChild.css("color", "red");
+                $firstChild.attr('id', 'red');
+                playSong(songId, songName, tag);
+            }
+            // 将上一首恢复原来状态
+            $currentRed.attr('id', '');
+            $currentRed.css('color', '#74bd59');
+
+        } else {
+            //从头开始播放
+            var leftSongList = document.getElementById('songList');
+            var $firstnode = $(leftSongList.firstChild);
+            var songId = $firstnode.attr('songId');
+            var tag = $firstnode.attr('tag');
+            var songName = $firstnode.text();
+            $firstnode.css("color", "red");
+            $firstnode.attr('id', 'red');
+            playSong(songId, songName, tag);
+        }
+
+
     }
 
     //播放模式的实现
@@ -188,8 +308,8 @@ window.onload = function () {
             var playlistTag = cplayTag;
             // console.log(songList);
             var $ul = $("#songList");
-            var tag = $("<li id='tag' data='" + playlistTag + "' style='margin-bottom: 10px;'>类别：" + playlistTag + "</li>");
-            $ul.append(tag);
+            // var tag = $("<li id='tag' data='" + playlistTag + "' style='margin-bottom: 10px;'>类别：" + playlistTag + "</li>");
+            // $ul.append(tag);
             for (var i = 0; i < songList.length; i++) {
                 var $li = $("<li tag='" + playlistTag + "' class='persong' songId='" + songList[i].id + "'>" + songList[i].name.substring(0, 30) + "</li>");
                 // var $li = $("<div class=\"alert alert-success\" songId='" + songList[i].id + "' onclick='getSong(this)'>" + songList[i].name.substring(0, 30) + "</div>");
@@ -220,6 +340,11 @@ window.onload = function () {
         if ($userSpan.length != 0) {
             userName = $userSpan.text();
         }
+
+        // 将左侧列表中的样式转化成最初的样子
+        var $currentRed = $('#red');
+        $currentRed.attr('id', '');
+        $currentRed.css('color', '#74bd59');
 
         //请求网易云音乐接口
         $.get(
@@ -284,10 +409,6 @@ window.onload = function () {
                 }
 
 
-
-
-
-
             }
         );
     });
@@ -303,9 +424,15 @@ window.onload = function () {
         // 异步请求
         var userId = '';
 
+        var $userSpan = $('div#user span');
+        var userName = ''; // 用户名
+        if ($userSpan.length != 0) {
+            userName = $userSpan.text();
+        }
+
         $.get(
             "/spidertask/getRec", {
-                userId: userId,
+                userName: userName,
             }, function (data, state) {
                 songInfo = data.data;
                 recsong.textContent = songInfo[1] + '-' + songInfo[2];
