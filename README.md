@@ -18,7 +18,7 @@
 
 ![gongzonghao](https://github.com/fandsimple/src/blob/master/img/wx.jpeg)
 
-### 作者公众号（获取取更多项目）
+### 公众号（关注公众号，发送项目，获取取更多项目地址）
 
 ![gongzonghao](https://github.com/fandsimple/src/blob/master/img/gongzonghao.jpeg)
 
